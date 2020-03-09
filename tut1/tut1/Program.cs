@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -8,25 +9,47 @@ namespace tut1
 {
     class Program
     {
-        static async Task Main(string[] args) 
+        public static async Task Main(string[] args) 
         {
-            if(args[0] == null)
+            var url = args.Length > 0 ? args[0] : throw new ArgumentException();
+            //var url = "https://www.pja.edu.pl";
+
+            using var httpclient = new HttpClient();
+            try
             {
-                throw new Exception("You didn't ini")
+                var response = await httpclient.GetAsync(url);
+
+                if(response.IsSuccessStatusCode)
+                { 
+                    var regex = new Regex("[a-z]+[a-z0-9]*@[a-z]+\\.[a-z]+", RegexOptions.IgnoreCase);
+
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    var emailAddresses = regex.Matches(responseContent);
+
+                    var setOfAddresses = new HashSet<string>();
+
+                    if (emailAddresses.Count > 0)
+                    {
+                        foreach (var emailAddress in emailAddresses)
+                        {
+                            setOfAddresses.Add(emailAddress.ToString());
+                        }
+                        
+                        foreach(var email in setOfAddresses)
+                        {
+                            WriteLine($"Found email: {email}");
+                        }
+                    }
+                    else
+                    {
+                        WriteLine("No email addresses were found");
+                    }
+                }
             }
-
-
-            var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(args[0]);
-
-            var regex = new Regex(@"[a-z][A-Z]@");
-
-            var content = response.Content;
-            var matches = regex.Matches(content.ToString());
-
-            foreach ( var match in matches)
+            catch (ArgumentException)
             {
-                WriteLine(match.ToString());
+                WriteLine("Such url was not found");
             }
 
         }
