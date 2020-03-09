@@ -11,8 +11,8 @@ namespace tut1
     {
         public static async Task Main(string[] args) 
         {
-            var url = args.Length > 0 ? args[0] : throw new ArgumentException();
-            //var url = "https://www.pja.edu.pl";
+            //var url = args.Length > 0 ? args[0] : throw new ArgumentException();
+            var url = "https://www.pja.edu.pl";
 
             using var httpclient = new HttpClient();
             try
@@ -33,13 +33,18 @@ namespace tut1
                     {
                         foreach (var emailAddress in emailAddresses)
                         {
-                            setOfAddresses.Add(emailAddress.ToString());
+                            if(setOfAddresses.Contains(emailAddress.ToString()))
+                            {
+                                
+                            }
+                            else
+                            {
+                                setOfAddresses.Add(emailAddress.ToString());
+                                WriteLine($"Found email: {emailAddress.ToString()}");
+                            }
+                            
                         }
                         
-                        foreach(var email in setOfAddresses)
-                        {
-                            WriteLine($"Found email: {email}");
-                        }
                     }
                     else
                     {
